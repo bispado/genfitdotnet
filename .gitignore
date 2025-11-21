@@ -1,0 +1,37 @@
+﻿## Ignore build results
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+## Ignore user-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Ignore Visual Studio files
+.vs/
+.vscode/
+
+## Ignore logs
+logs/
+*.log
+
+## Ignore OS files
+.DS_Store
+Thumbs.db
+
+## Ignore NuGet packages
+*.nupkg
+*.snupkg
+
+## Ignore test results
+TestResults/
+*.trx
+
+## Ignore coverage reports
+coverage/
+*.coverage
+*.coveragexml

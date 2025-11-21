@@ -1,0 +1,10 @@
+{
+  "titulo": "Desenvolvedor java",
+  "descricao": "Vaga para desenvolvedor java com experiência em APIs RESTful",
+  "salario": 12000,
+  "localizacao": "São Paulo",
+  "tipoContrato": "CLT",
+  "nivel": "Senior",
+  "modeloTrabalho": "Híbrido",
+  "departamento": "Tecnologia"
+}

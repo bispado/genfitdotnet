@@ -1,0 +1,6 @@
+@GenFit.API_HostAddress = http://localhost:5118
+
+GET {{GenFit.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
