@@ -272,3 +272,5 @@ Para questões sobre a API, consulte a documentação Swagger ou abra uma issue 
 ---
 
 **🔗 Repositório:** [https://github.com/bispado/genfitdotnet](https://github.com/bispado/genfitdotnet)
+
+**📅 Última atualização:** 2025-11-22 - Teste de pipeline CI/CD
