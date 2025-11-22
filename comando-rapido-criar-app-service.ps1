@@ -7,11 +7,8 @@ $APP_SERVICE_NAME = "api-genfit-rm558515"
 
 Write-Host "Criando App Service: $APP_SERVICE_NAME..." -ForegroundColor Yellow
 
-az webapp create `
-  --name $APP_SERVICE_NAME `
-  --resource-group $RESOURCE_GROUP `
-  --plan $APP_SERVICE_PLAN `
-  --runtime 'DOTNETCORE|8.0'
+$RUNTIME = "DOTNETCORE|8.0"
+az webapp create --name $APP_SERVICE_NAME --resource-group $RESOURCE_GROUP --plan $APP_SERVICE_PLAN --runtime $RUNTIME
 
 Write-Host "`nConfigurando App Settings..." -ForegroundColor Yellow
 az webapp config appsettings set `
