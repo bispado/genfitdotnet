@@ -9,6 +9,7 @@ using GenFit.Application.DTOs;
 using System.Net;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 namespace GenFit.Tests.Controllers;
 
@@ -23,6 +24,15 @@ public class UsersControllerTests
         _mockUserService = new Mock<IUserService>();
         _mockLogger = new Mock<ILogger<UsersController>>();
         _controller = new UsersController(_mockUserService.Object, _mockLogger.Object);
+        
+        // Configurar o contexto HTTP para o controller
+        var httpContext = new DefaultHttpContext();
+        httpContext.Request.Scheme = "http";
+        httpContext.Request.Host = new HostString("localhost", 5000);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = httpContext
+        };
     }
 
     [Fact]
