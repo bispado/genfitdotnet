@@ -44,7 +44,7 @@ az webapp create `
   --name $APP_SERVICE_NAME `
   --resource-group $RESOURCE_GROUP `
   --plan $APP_SERVICE_PLAN `
-  --runtime "DOTNETCORE|8.0"
+  --runtime 'DOTNETCORE|8.0'
 
 # Configurar App Settings
 Write-Host "`nConfigurando App Settings..." -ForegroundColor Yellow
