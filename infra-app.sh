@@ -3,21 +3,78 @@
 # Script de infraestrutura para deploy da API GenFit no Azure
 # Parâmetros esperados: ORACLE_HOST ORACLE_PORT ORACLE_SID ORACLE_USER ORACLE_PASS LOCATION
 # Uso: ./infra-app.sh <ORACLE_HOST> <ORACLE_PORT> <ORACLE_SID> <ORACLE_USER> <ORACLE_PASS> <LOCATION>
+# Ou: ./infra-app.sh -ORACLE_HOST host -ORACLE_PORT port -ORACLE_SID sid -ORACLE_USER user -ORACLE_PASS pass -LOCATION location
 
 set -e
 
-# Parâmetros
-ORACLE_HOST=${1:-"oracle.fiap.com.br"}
-ORACLE_PORT=${2:-"1521"}
-ORACLE_SID=${3:-"ORCL"}
-ORACLE_USER=${4:-"pf0841"}
-ORACLE_PASS=${5}
-LOCATION=${6:-"brazilsouth"}
+# Valores padrão
+ORACLE_HOST="oracle.fiap.com.br"
+ORACLE_PORT="1521"
+ORACLE_SID="ORCL"
+ORACLE_USER="pf0841"
+ORACLE_PASS=""
+LOCATION="brazilsouth"
+NOME_WEBAPP=""
+
+# Processar argumentos nomeados ou posicionais
+if [[ "$1" =~ ^- ]]; then
+    # Formato nomeado: -ORACLE_HOST valor -ORACLE_PORT valor...
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -ORACLE_HOST)
+                ORACLE_HOST="$2"
+                shift 2
+                ;;
+            -ORACLE_PORT)
+                ORACLE_PORT="$2"
+                shift 2
+                ;;
+            -ORACLE_SID)
+                ORACLE_SID="$2"
+                shift 2
+                ;;
+            -ORACLE_USER)
+                ORACLE_USER="$2"
+                shift 2
+                ;;
+            -ORACLE_PASS)
+                ORACLE_PASS="$2"
+                shift 2
+                ;;
+            -LOCATION)
+                LOCATION="$2"
+                shift 2
+                ;;
+            -NOME_WEBAPP)
+                NOME_WEBAPP="$2"
+                shift 2
+                ;;
+            *)
+                echo "Argumento desconhecido: $1"
+                shift
+                ;;
+        esac
+    done
+else
+    # Formato posicional: valor1 valor2 valor3...
+    ORACLE_HOST=${1:-"$ORACLE_HOST"}
+    ORACLE_PORT=${2:-"$ORACLE_PORT"}
+    ORACLE_SID=${3:-"$ORACLE_SID"}
+    ORACLE_USER=${4:-"$ORACLE_USER"}
+    ORACLE_PASS=${5:-"$ORACLE_PASS"}
+    LOCATION=${6:-"$LOCATION"}
+    NOME_WEBAPP=${7:-"$NOME_WEBAPP"}
+fi
+
+# Usar variável de ambiente NOME_WEBAPP se não foi passada como argumento
+if [[ -z "$NOME_WEBAPP" && -n "$NOME_WEBAPP_ENV" ]]; then
+    NOME_WEBAPP="$NOME_WEBAPP_ENV"
+fi
 
 # Configurações do Azure
 RESOURCE_GROUP="rg-genfit-$(date +%Y%m%d)"
 APP_SERVICE_PLAN="asp-genfit"
-APP_SERVICE_NAME="api-genfit-$(whoami | tr '[:upper:]' '[:lower:]')"
+APP_SERVICE_NAME="${NOME_WEBAPP:-api-genfit-$(whoami | tr '[:upper:]' '[:lower:]')}"
 SKU="B1"
 
 echo "=========================================="
