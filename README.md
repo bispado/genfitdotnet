@@ -135,6 +135,252 @@ A API estará disponível em: `http://localhost:5118`
 - `PUT /api/v1/users/{id}` - Atualiza usuário
 - `DELETE /api/v1/users/{id}` - Remove usuário
 
+## 🔄 Exemplos de CRUD em JSON
+
+### Tabela: JOBS (Vagas)
+
+#### CREATE - Criar Vaga
+**POST** `/api/v1/jobs`
+```json
+{
+  "titulo": "Desenvolvedor .NET Senior",
+  "descricao": "Vaga para desenvolvedor .NET com experiência em APIs RESTful e Oracle Database",
+  "salario": 12000.00,
+  "localizacao": "São Paulo - SP",
+  "tipoContrato": "CLT",
+  "nivel": "Senior",
+  "modeloTrabalho": "Híbrido",
+  "departamento": "Tecnologia"
+}
+```
+
+**Resposta (201 Created):**
+```json
+{
+  "id": 1,
+  "titulo": "Desenvolvedor .NET Senior",
+  "descricao": "Vaga para desenvolvedor .NET com experiência em APIs RESTful e Oracle Database",
+  "salario": 12000.00,
+  "localizacao": "São Paulo - SP",
+  "tipoContrato": "CLT",
+  "nivel": "Senior",
+  "modeloTrabalho": "Híbrido",
+  "departamento": "Tecnologia",
+  "createdAt": "2025-11-22T10:00:00Z",
+  "updatedAt": "2025-11-22T10:00:00Z"
+}
+```
+
+#### READ - Listar Vagas
+**GET** `/api/v1/jobs?pageNumber=1&pageSize=10`
+
+**Resposta (200 OK):**
+```json
+{
+  "items": [
+    {
+      "id": 1,
+      "titulo": "Desenvolvedor .NET Senior",
+      "descricao": "Vaga para desenvolvedor .NET...",
+      "salario": 12000.00,
+      "localizacao": "São Paulo - SP",
+      "tipoContrato": "CLT",
+      "nivel": "Senior",
+      "modeloTrabalho": "Híbrido",
+      "departamento": "Tecnologia",
+      "createdAt": "2025-11-22T10:00:00Z",
+      "updatedAt": "2025-11-22T10:00:00Z"
+    }
+  ],
+  "pageNumber": 1,
+  "pageSize": 10,
+  "totalCount": 1,
+  "totalPages": 1,
+  "hasPrevious": false,
+  "hasNext": false,
+  "links": {
+    "self": "/api/v1/jobs?pageNumber=1&pageSize=10",
+    "first": "/api/v1/jobs?pageNumber=1&pageSize=10",
+    "last": "/api/v1/jobs?pageNumber=1&pageSize=10"
+  }
+}
+```
+
+#### READ - Obter Vaga por ID
+**GET** `/api/v1/jobs/1`
+
+**Resposta (200 OK):**
+```json
+{
+  "id": 1,
+  "titulo": "Desenvolvedor .NET Senior",
+  "descricao": "Vaga para desenvolvedor .NET com experiência em APIs RESTful e Oracle Database",
+  "salario": 12000.00,
+  "localizacao": "São Paulo - SP",
+  "tipoContrato": "CLT",
+  "nivel": "Senior",
+  "modeloTrabalho": "Híbrido",
+  "departamento": "Tecnologia",
+  "createdAt": "2025-11-22T10:00:00Z",
+  "updatedAt": "2025-11-22T10:00:00Z"
+}
+```
+
+#### UPDATE - Atualizar Vaga
+**PUT** `/api/v1/jobs/1`
+```json
+{
+  "titulo": "Desenvolvedor .NET Senior - Atualizado",
+  "salario": 15000.00,
+  "localizacao": "São Paulo - SP (Remoto)"
+}
+```
+
+**Resposta (200 OK):**
+```json
+{
+  "id": 1,
+  "titulo": "Desenvolvedor .NET Senior - Atualizado",
+  "descricao": "Vaga para desenvolvedor .NET com experiência em APIs RESTful e Oracle Database",
+  "salario": 15000.00,
+  "localizacao": "São Paulo - SP (Remoto)",
+  "tipoContrato": "CLT",
+  "nivel": "Senior",
+  "modeloTrabalho": "Híbrido",
+  "departamento": "Tecnologia",
+  "createdAt": "2025-11-22T10:00:00Z",
+  "updatedAt": "2025-11-22T11:00:00Z"
+}
+```
+
+#### DELETE - Remover Vaga
+**DELETE** `/api/v1/jobs/1`
+
+**Resposta (200 OK):**
+```json
+{
+  "message": "Deletado com sucesso",
+  "id": 1
+}
+```
+
+### Tabela: USERS (Usuários)
+
+#### CREATE - Criar Usuário
+**POST** `/api/v1/users`
+```json
+{
+  "role": "candidate",
+  "nome": "João Silva",
+  "email": "joao.silva@example.com",
+  "senhaHash": "hashed_password_here",
+  "cpf": "123.456.789-00",
+  "telefone": "(11) 99999-9999",
+  "dataNascimento": "1990-01-15T00:00:00Z",
+  "linkedInUrl": "https://linkedin.com/in/joaosilva"
+}
+```
+
+**Resposta (201 Created):**
+```json
+{
+  "id": 1,
+  "role": "candidate",
+  "nome": "João Silva",
+  "email": "joao.silva@example.com",
+  "cpf": "123.456.789-00",
+  "telefone": "(11) 99999-9999",
+  "dataNascimento": "1990-01-15T00:00:00Z",
+  "linkedInUrl": "https://linkedin.com/in/joaosilva",
+  "createdAt": "2025-11-22T10:00:00Z",
+  "updatedAt": "2025-11-22T10:00:00Z"
+}
+```
+
+#### READ - Listar Usuários
+**GET** `/api/v1/users?pageNumber=1&pageSize=10`
+
+**Resposta (200 OK):**
+```json
+{
+  "items": [
+    {
+      "id": 1,
+      "role": "candidate",
+      "nome": "João Silva",
+      "email": "joao.silva@example.com",
+      "cpf": "123.456.789-00",
+      "telefone": "(11) 99999-9999",
+      "dataNascimento": "1990-01-15T00:00:00Z",
+      "linkedInUrl": "https://linkedin.com/in/joaosilva",
+      "createdAt": "2025-11-22T10:00:00Z",
+      "updatedAt": "2025-11-22T10:00:00Z"
+    }
+  ],
+  "pageNumber": 1,
+  "pageSize": 10,
+  "totalCount": 1,
+  "totalPages": 1,
+  "hasPrevious": false,
+  "hasNext": false,
+  "links": {
+    "self": "/api/v1/users?pageNumber=1&pageSize=10",
+    "first": "/api/v1/users?pageNumber=1&pageSize=10",
+    "last": "/api/v1/users?pageNumber=1&pageSize=10"
+  }
+}
+```
+
+#### READ - Obter Usuário por ID
+**GET** `/api/v1/users/1`
+
+**Resposta (200 OK):**
+```json
+{
+  "id": 1,
+  "role": "candidate",
+  "nome": "João Silva",
+  "email": "joao.silva@example.com",
+  "cpf": "123.456.789-00",
+  "telefone": "(11) 99999-9999",
+  "dataNascimento": "1990-01-15T00:00:00Z",
+  "linkedInUrl": "https://linkedin.com/in/joaosilva",
+  "createdAt": "2025-11-22T10:00:00Z",
+  "updatedAt": "2025-11-22T10:00:00Z"
+}
+```
+
+#### UPDATE - Atualizar Usuário
+**PUT** `/api/v1/users/1`
+```json
+{
+  "nome": "João Silva Santos",
+  "telefone": "(11) 88888-8888",
+  "linkedInUrl": "https://linkedin.com/in/joaosilvasantos"
+}
+```
+
+**Resposta (200 OK):**
+```json
+{
+  "id": 1,
+  "role": "candidate",
+  "nome": "João Silva Santos",
+  "email": "joao.silva@example.com",
+  "cpf": "123.456.789-00",
+  "telefone": "(11) 88888-8888",
+  "dataNascimento": "1990-01-15T00:00:00Z",
+  "linkedInUrl": "https://linkedin.com/in/joaosilvasantos",
+  "createdAt": "2025-11-22T10:00:00Z",
+  "updatedAt": "2025-11-22T11:00:00Z"
+}
+```
+
+#### DELETE - Remover Usuário
+**DELETE** `/api/v1/users/1`
+
+**Resposta (204 No Content)**
+
 ### Skills (Competências)
 - `GET /api/v1/skills` - Lista skills com paginação
 - `GET /api/v1/skills/{id}` - Obtém skill por ID
