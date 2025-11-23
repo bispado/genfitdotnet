@@ -471,7 +471,7 @@ Acesse a documentação interativa em:
 
 ## 🚀 Deploy no Azure
 
-O projeto inclui o script `infra-app.sh` para configuração automática da infraestrutura no Azure via Azure DevOps Pipeline.
+O projeto inclui o script `scripts/script-infra-app.sh` para configuração automática da infraestrutura no Azure via Azure DevOps Pipeline.
 
 ### Variáveis de Ambiente
 
@@ -519,6 +519,6 @@ Para questões sobre a API, consulte a documentação Swagger ou abra uma issue 
 
 **🔗 Repositório:** [https://github.com/bispado/genfitdotnet](https://github.com/bispado/genfitdotnet)
 
-**📅 Última atualização:** 2025-11-22 - Teste de pipeline CI/CD
+**📅 Última atualização:** 2025-11-23 - Pipeline de testes automatizados configurada
 
 **🔗 Azure DevOps:** [https://dev.azure.com/motosync/genfit](https://dev.azure.com/motosync/genfit)
