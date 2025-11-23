@@ -519,6 +519,6 @@ Para questões sobre a API, consulte a documentação Swagger ou abra uma issue 
 
 **🔗 Repositório:** [https://github.com/bispado/genfitdotnet](https://github.com/bispado/genfitdotnet)
 
-**📅 Última atualização:** 2025-11-23 - Pipeline de testes automatizados configurada
+**📅 Última atualização:** 2025-11-23 - Teste de commit para validar pipeline CI/CD completa
 
 **🔗 Azure DevOps:** [https://dev.azure.com/motosync/genfit](https://dev.azure.com/motosync/genfit)
