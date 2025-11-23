@@ -96,34 +96,59 @@ az account show > /dev/null 2>&1 || {
     exit 1
 }
 
-# Criar Resource Group
-echo "Criando Resource Group: $RESOURCE_GROUP..."
-az group create --name "$RESOURCE_GROUP" --location "$LOCATION" || {
-    echo "ERRO: Falha ao criar Resource Group"
-    exit 1
-}
+# Verificar se o App Service já existe e em qual Resource Group
+echo "Verificando se App Service já existe..."
+EXISTING_RG=$(az webapp list --query "[?name=='$APP_SERVICE_NAME'].resourceGroup" -o tsv 2>/dev/null | head -n 1)
 
-# Criar App Service Plan
-echo "Criando App Service Plan: $APP_SERVICE_PLAN..."
-az appservice plan create \
-    --name "$APP_SERVICE_PLAN" \
-    --resource-group "$RESOURCE_GROUP" \
-    --sku "$SKU" \
-    --is-linux || {
-    echo "ERRO: Falha ao criar App Service Plan"
-    exit 1
-}
+if [ -n "$EXISTING_RG" ]; then
+    echo "AVISO: App Service '$APP_SERVICE_NAME' já existe no Resource Group '$EXISTING_RG'"
+    echo "Usando Resource Group existente: $EXISTING_RG"
+    RESOURCE_GROUP="$EXISTING_RG"
+else
+    # Criar Resource Group apenas se o App Service não existir
+    echo "Criando Resource Group: $RESOURCE_GROUP..."
+    az group create --name "$RESOURCE_GROUP" --location "$LOCATION" || {
+        echo "ERRO: Falha ao criar Resource Group"
+        exit 1
+    }
+fi
 
-# Criar App Service
-echo "Criando App Service: $APP_SERVICE_NAME..."
-az webapp create \
-    --name "$APP_SERVICE_NAME" \
-    --resource-group "$RESOURCE_GROUP" \
-    --plan "$APP_SERVICE_PLAN" \
-    --runtime "DOTNETCORE|8.0" || {
-    echo "ERRO: Falha ao criar App Service"
-    exit 1
-}
+# Verificar se App Service Plan já existe no Resource Group
+echo "Verificando App Service Plan: $APP_SERVICE_PLAN..."
+PLAN_EXISTS=$(az appservice plan list --resource-group "$RESOURCE_GROUP" --query "[?name=='$APP_SERVICE_PLAN']" -o tsv)
+
+if [ -z "$PLAN_EXISTS" ]; then
+    # Criar App Service Plan apenas se não existir
+    echo "Criando App Service Plan: $APP_SERVICE_PLAN..."
+    az appservice plan create \
+        --name "$APP_SERVICE_PLAN" \
+        --resource-group "$RESOURCE_GROUP" \
+        --sku "$SKU" \
+        --is-linux || {
+        echo "ERRO: Falha ao criar App Service Plan"
+        exit 1
+    }
+else
+    echo "App Service Plan '$APP_SERVICE_PLAN' já existe. Usando o existente."
+fi
+
+# Verificar se App Service já existe
+WEBAPP_EXISTS=$(az webapp list --resource-group "$RESOURCE_GROUP" --query "[?name=='$APP_SERVICE_NAME']" -o tsv)
+
+if [ -z "$WEBAPP_EXISTS" ]; then
+    # Criar App Service apenas se não existir
+    echo "Criando App Service: $APP_SERVICE_NAME..."
+    az webapp create \
+        --name "$APP_SERVICE_NAME" \
+        --resource-group "$RESOURCE_GROUP" \
+        --plan "$APP_SERVICE_PLAN" \
+        --runtime "DOTNETCORE|8.0" || {
+        echo "ERRO: Falha ao criar App Service"
+        exit 1
+    }
+else
+    echo "App Service '$APP_SERVICE_NAME' já existe. Usando o existente."
+fi
 
 # Configurar App Settings
 echo "Configurando App Settings..."
