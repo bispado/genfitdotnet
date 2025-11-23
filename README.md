@@ -1,47 +1,231 @@
 # GenFit API - Sistema de Gestão de RH e Candidatos
 
+> **Global Solution (GS) - DevOps Tools & Cloud Computing**  
 > API RESTful desenvolvida em .NET 8 para o sistema GenFit, voltada ao tema **"O Futuro do Trabalho"**. O sistema permite gerenciar candidatos, vagas de emprego, skills, cursos de requalificação e análises de compatibilidade usando IA.
 
 [![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat&logo=dotnet)](https://dotnet.microsoft.com/)
 [![Oracle](https://img.shields.io/badge/Oracle-Database-F80000?style=flat&logo=oracle)](https://www.oracle.com/database/)
 [![Entity Framework](https://img.shields.io/badge/EF%20Core-8.0-512BD4?style=flat&logo=.net)](https://learn.microsoft.com/ef/core/)
+[![Azure DevOps](https://img.shields.io/badge/Azure%20DevOps-0078D4?style=flat&logo=azure-devops)](https://dev.azure.com/motosync/genfit)
 
-## 🚀 Tecnologia
+---
+
+## 🔗 Links da Entrega
+
+- **🔗 Azure DevOps Organization:** [https://dev.azure.com/motosync/genfit](https://dev.azure.com/motosync/genfit)
+- **📦 Repositório Azure DevOps:** [https://dev.azure.com/motosync/genfit/_git/genfit-CI](https://dev.azure.com/motosync/genfit/_git/genfit-CI)
+- **🌐 API em Produção:** [https://api-genfit-rm558515.azurewebsites.net](https://api-genfit-rm558515.azurewebsites.net)
+- **📖 Swagger (Documentação):** [https://api-genfit-rm558515.azurewebsites.net/swagger](https://api-genfit-rm558515.azurewebsites.net/swagger)
+- **🏥 Health Check:** [https://api-genfit-rm558515.azurewebsites.net/health](https://api-genfit-rm558515.azurewebsites.net/health)
+- **🔗 Repositório GitHub:** [https://github.com/bispado/genfitdotnet](https://github.com/bispado/genfitdotnet)
+
+---
+
+## 🎯 DevOps Tools & Cloud Computing (GS)
+
+Este projeto foi desenvolvido como solução para a **Global Solution (GS)** de **DevOps Tools & Cloud Computing**, demonstrando a integração completa das ferramentas Azure DevOps conforme os requisitos da entrega.
+
+### ✅ Requisitos Atendidos
+
+#### 1. Provisionamento em Nuvem (Azure CLI) ✅
+- **Script:** `scripts/script-infra-app.sh`
+- **Recursos criados:**
+  - Resource Group (`rg-genfit-YYYYMMDD`)
+  - App Service Plan (`asp-genfit` - SKU B1, Linux)
+  - App Service (`api-genfit-rm558515` - .NET 8.0)
+- **Características:**
+  - Script idempotente (pode ser executado múltiplas vezes)
+  - Verifica recursos existentes antes de criar
+  - Configura App Settings automaticamente
+  - Suporta parâmetros nomeados e variáveis de ambiente
+
+#### 2. Projeto no Azure DevOps ✅
+- **Organização:** `https://dev.azure.com/motosync/genfit`
+- **Projeto:** GenFit
+- **Permissões:** Professor convidado com permissões Basic (Organização) e Contributor (Projeto)
+
+#### 3. Código no Azure Repos ✅
+- **Repositório:** `https://dev.azure.com/motosync/genfit/_git/genfit-CI`
+- **Branch principal:** `main` (protegida)
+- **Políticas de branch:**
+  - ✅ Revisor obrigatório
+  - ✅ Vinculação de Work Item obrigatória
+  - ✅ Revisor padrão configurado
+- **Versionamento:** Git completo com histórico de commits
+
+#### 4. Azure Boards ✅
+- **Work Items:** Criados e vinculados a commits, branches e Pull Requests
+- **Rastreamento:** Histórico completo do ciclo de vida do desenvolvimento
+- **Links:** Commits, branches e PRs vinculados aos Work Items
+
+#### 5. Pipeline de Build (CI) ✅
+- **Tipo:** YAML (`azure-pipelines.yml` na raiz)
+- **Trigger:** Automaticamente após merge via Pull Request na branch `main`
+- **Etapas:**
+  1. Provisionamento de infraestrutura via Azure CLI
+  2. Restore de dependências .NET
+  3. Build da aplicação
+  4. Execução de testes automatizados (xUnit)
+  5. **Publicação de resultados de testes** (formato VSTest/TRX)
+  6. Publicação de artefatos para deploy
+- **Testes publicados:** Resultados visíveis na aba "Tests" do Azure DevOps
+
+#### 6. Pipeline de Release (CD) ✅
+- **Tipo:** Classic Release Pipeline
+- **Nome:** `Deploy em dev`
+- **Trigger:** Automaticamente após Build gerar novo artefato
+- **Etapas:**
+  1. Download de artefatos da Build Pipeline
+  2. Deploy automático para Azure App Service
+  3. Configuração de App Settings via variáveis de ambiente
+
+#### 7. Requisitos de Implementação ✅
+- ✅ Projeto privado com Git para versionamento
+- ✅ Azure Boards vinculado ao Repos (Commits, Branches, PRs)
+- ✅ Branch principal protegida (Revisor obrigatório, Work Item obrigatório, Revisor padrão)
+- ✅ Build acionado somente após Merge via PR
+- ✅ Aluno pode aprovar sua própria PR (simulação)
+- ✅ Release executa automaticamente após novo artefato
+- ✅ Deploy via Web App PaaS (Azure App Service)
+- ✅ Banco de dados em PaaS (Oracle Database - FIAP Cloud)
+- ✅ Scripts de infraestrutura no repositório (`scripts/script-infra-app.sh`)
+- ✅ Arquivo `scripts/script-bd.sql` na pasta `/scripts`
+- ✅ Scripts Azure CLI com prefixo `script-infra` (`script-infra-app.sh`)
+- ✅ Arquivo `azure-pipelines.yml` na raiz do repositório (YAML)
+- ✅ CRUD exposto em JSON no README (veja seção abaixo)
+- ✅ Variáveis de ambiente protegidas (senhas não expostas)
+- ✅ Desenho macro da arquitetura (veja seção abaixo)
+
+---
+
+## 📊 Arquitetura da Solução
+
+### Diagrama Macro da Arquitetura
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Azure App Service                        │
+│              (PaaS - Linux, .NET 8.0)                       │
+│  URL: https://api-genfit-rm558515.azurewebsites.net        │
+├─────────────────────────────────────────────────────────────┤
+│  Camada de Apresentação (GenFit.API)                        │
+│  ├── Controllers/V1/ (Jobs, Users, Skills)                  │
+│  ├── Middleware/ (API Key Authentication)                   │
+│  └── Program.cs (Configuração, Health Checks, Swagger)      │
+│  ↓                                                           │
+│  Camada de Aplicação (GenFit.Application)                   │
+│  ├── Services/ (JobService, UserService)                    │
+│  ├── DTOs/ (JobDto, UserDto, CreateJobDto)                  │
+│  └── Common/ (PagedResult, PaginationParameters)            │
+│  ↓                                                           │
+│  Camada de Infraestrutura (GenFit.Infrastructure)          │
+│  ├── Data/ (GenFitDbContext, Entity Configurations)         │
+│  ├── Services/ (OracleProcedureService)                      │
+│  └── HealthChecks/ (OracleHealthCheck)                      │
+│  ↓                                                           │
+│  Camada de Domínio (GenFit.Core)                            │
+│  └── Entities/ (User, Job, Skill, Course, etc.)             │
+└─────────────────────────────────────────────────────────────┘
+                        ↓ Entity Framework Core
+┌─────────────────────────────────────────────────────────────┐
+│              Oracle Database (FIAP Cloud)                   │
+│  Host: oracle.fiap.com.br:1521/ORCL                        │
+│  Tabelas: USERS, JOBS, SKILLS, COURSES,                     │
+│          CANDIDATE_SKILLS, JOB_SKILLS,                      │
+│          MODEL_RESULTS, AUDIT_LOGS, etc.                    │
+│  Stored Procedures: PRC_INSERT_USER, PRC_INSERT_JOB, etc.  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Fluxo CI/CD Completo
+
+```
+┌─────────────┐
+│  Developer  │
+└──────┬──────┘
+       │ Commit
+       ↓
+┌─────────────┐
+│   Branch    │ (test/feature)
+└──────┬──────┘
+       │ Push
+       ↓
+┌─────────────┐
+│ Pull Request│ (vinculado a Work Item)
+└──────┬──────┘
+       │ Aprovação + Merge
+       ↓
+┌─────────────────────────────────────┐
+│     Build Pipeline (CI)             │
+│  ┌───────────────────────────────┐  │
+│  │ 1. Provisionamento (Azure CLI) │  │
+│  │ 2. Restore Dependencies       │  │
+│  │ 3. Build Application          │  │
+│  │ 4. Run Tests (xUnit)          │  │
+│  │ 5. Publish Test Results       │  │
+│  │ 6. Publish Artifacts          │  │
+│  └───────────────────────────────┘  │
+└──────────────┬──────────────────────┘
+               │ Trigger automático
+               ↓
+┌─────────────────────────────────────┐
+│    Release Pipeline (CD)            │
+│  ┌───────────────────────────────┐  │
+│  │ 1. Download Artifacts         │  │
+│  │ 2. Deploy to App Service      │  │
+│  │ 3. Configure App Settings     │  │
+│  └───────────────────────────────┘  │
+└──────────────┬──────────────────────┘
+               │
+               ↓
+┌─────────────────────────────────────┐
+│   Azure App Service (Produção)      │
+│   https://api-genfit-rm558515...     │
+└─────────────────────────────────────┘
+```
+
+---
+
+## 🚀 Tecnologias Utilizadas
 
 - **.NET 8.0** - Framework principal
 - **Entity Framework Core** - ORM com provider Oracle
-- **Oracle Database** - Banco de dados relacional
+- **Oracle Database** - Banco de dados relacional (FIAP Cloud)
 - **Serilog** - Logging estruturado
 - **OpenTelemetry** - Tracing e observabilidade
 - **xUnit** - Framework de testes
 - **Swagger/OpenAPI** - Documentação interativa
 - **Asp.Versioning** - Versionamento de API
+- **Azure App Service** - PaaS para hospedagem
+- **Azure DevOps** - CI/CD, Boards, Repos, Pipelines
 
-## 📋 Funcionalidades
+---
+
+## 📋 Funcionalidades da API
 
 ✅ **Boas Práticas REST**
 - Paginação e HATEOAS em todos os endpoints de listagem
-- Status codes HTTP adequados
+- Status codes HTTP adequados (200, 201, 204, 400, 404, 500)
 - Uso correto dos verbos HTTP (GET, POST, PUT, DELETE)
 
 ✅ **Monitoramento e Observabilidade**
-- Health Check customizado para Oracle Database
+- Health Check customizado para Oracle Database (`/health`)
 - Logging estruturado com Serilog (console e arquivo)
 - Tracing distribuído com OpenTelemetry
 
 ✅ **Versionamento de API**
 - Versionamento via URL (`/api/v1/`)
 - Suporte a múltiplas versões simultâneas
-- Controle de versão via query string, header ou media type
+- Controle via query string, header ou media type
 
 ✅ **Integração e Persistência**
 - Entity Framework Core com Oracle
 - Migrations automatizadas
-- Integração com Stored Procedures Oracle
-  - `PRC_INSERT_USER`
-  - `PRC_INSERT_JOB`
-  - `PRC_INSERT_CANDIDATE_SKILL`
-  - `PRC_INSERT_MODEL_RESULT`
+- **Integração com Stored Procedures Oracle:**
+  - `PRC_INSERT_USER` - Criação de usuários
+  - `PRC_INSERT_JOB` - Criação de vagas
+  - `PRC_INSERT_CANDIDATE_SKILL` - Vinculação de skills
+  - `PRC_INSERT_MODEL_RESULT` - Resultados de IA
 
 ✅ **Autenticação e Segurança**
 - Autenticação via API Key
@@ -50,90 +234,10 @@
 
 ✅ **Testes Automatizados**
 - Testes unitários com xUnit
-- Testes de integração (em desenvolvimento)
+- Testes de integração para controllers
+- Publicação automática na Build Pipeline
 
-## 🏗️ Estrutura do Projeto
-
-```
-GenFit/
-├── GenFit.API/              # Projeto principal da API
-│   ├── Controllers/V1/      # Controllers versionados
-│   ├── Middleware/          # Middleware customizado
-│   └── Program.cs           # Configuração da aplicação
-├── GenFit.Core/             # Entidades de domínio
-│   └── Entities/            # Entidades (User, Job, Skill, etc.)
-├── GenFit.Infrastructure/   # Camada de infraestrutura
-│   ├── Data/                # DbContext e configurações EF
-│   ├── HealthChecks/        # Health checks customizados
-│   └── Services/            # Serviços de infraestrutura
-├── GenFit.Application/      # Camada de aplicação
-│   ├── DTOs/                # Data Transfer Objects
-│   ├── Services/            # Serviços de aplicação
-│   └── Common/              # Classes compartilhadas
-└── GenFit.Tests/           # Testes unitários e de integração
-```
-
-## ⚙️ Configuração
-
-### Pré-requisitos
-
-- .NET 8.0 SDK
-- Oracle Database (ou acesso a um servidor Oracle)
-- Visual Studio 2022 / VS Code / Rider (opcional)
-
-### Instalação
-
-1. Clone o repositório:
-```bash
-git clone https://github.com/bispado/genfitdotnet.git
-cd genfitdotnet
-```
-
-2. Configure a connection string no `appsettings.Development.json`:
-```json
-{
-  "ConnectionStrings": {
-    "OracleConnection": "Data Source=HOST:PORT/SID;User Id=USER;Password=PASSWORD;"
-  },
-  "ApiKey": {
-    "HeaderName": "X-API-Key",
-    "Value": "your-secret-api-key"
-  }
-}
-```
-
-3. Restaure as dependências:
-```bash
-dotnet restore
-```
-
-4. Execute as migrations (se necessário):
-```bash
-dotnet ef database update --project GenFit.Infrastructure --startup-project GenFit.API
-```
-
-5. Execute a API:
-```bash
-dotnet run --project GenFit.API
-```
-
-A API estará disponível em: `http://localhost:5118`
-
-## 📚 Endpoints Principais
-
-### Jobs (Vagas) - CRUD Completo
-- `GET /api/v1/jobs` - Lista vagas com paginação e HATEOAS
-- `GET /api/v1/jobs/{id}` - Obtém vaga por ID
-- `POST /api/v1/jobs` - Cria vaga (via procedure Oracle)
-- `PUT /api/v1/jobs/{id}` - Atualiza vaga
-- `DELETE /api/v1/jobs/{id}` - Remove vaga
-
-### Users (Usuários)
-- `GET /api/v1/users` - Lista usuários com paginação
-- `GET /api/v1/users/{id}` - Obtém usuário por ID
-- `POST /api/v1/users` - Cria usuário (via procedure Oracle)
-- `PUT /api/v1/users/{id}` - Atualiza usuário
-- `DELETE /api/v1/users/{id}` - Remove usuário
+---
 
 ## 🔄 Exemplos de CRUD em JSON
 
@@ -381,6 +485,51 @@ A API estará disponível em: `http://localhost:5118`
 
 **Resposta (204 No Content)**
 
+---
+
+## 🏗️ Estrutura do Projeto
+
+```
+GenFit/
+├── GenFit.API/              # Projeto principal da API
+│   ├── Controllers/V1/      # Controllers versionados
+│   ├── Middleware/          # Middleware customizado
+│   └── Program.cs           # Configuração da aplicação
+├── GenFit.Core/             # Entidades de domínio
+│   └── Entities/            # Entidades (User, Job, Skill, etc.)
+├── GenFit.Infrastructure/   # Camada de infraestrutura
+│   ├── Data/                # DbContext e configurações EF
+│   ├── HealthChecks/        # Health checks customizados
+│   └── Services/            # Serviços de infraestrutura
+├── GenFit.Application/      # Camada de aplicação
+│   ├── DTOs/                # Data Transfer Objects
+│   ├── Services/            # Serviços de aplicação
+│   └── Common/              # Classes compartilhadas
+├── GenFit.Tests/           # Testes unitários e de integração
+├── scripts/
+│   ├── script-infra-app.sh  # Script de provisionamento Azure CLI
+│   └── script-bd.sql       # Script de criação do banco de dados
+└── azure-pipelines.yml     # Pipeline YAML de Build
+```
+
+---
+
+## 📚 Endpoints Principais
+
+### Jobs (Vagas) - CRUD Completo
+- `GET /api/v1/jobs` - Lista vagas com paginação e HATEOAS
+- `GET /api/v1/jobs/{id}` - Obtém vaga por ID
+- `POST /api/v1/jobs` - Cria vaga (via procedure Oracle `PRC_INSERT_JOB`)
+- `PUT /api/v1/jobs/{id}` - Atualiza vaga
+- `DELETE /api/v1/jobs/{id}` - Remove vaga
+
+### Users (Usuários) - CRUD Completo
+- `GET /api/v1/users` - Lista usuários com paginação
+- `GET /api/v1/users/{id}` - Obtém usuário por ID
+- `POST /api/v1/users` - Cria usuário (via procedure Oracle `PRC_INSERT_USER`)
+- `PUT /api/v1/users/{id}` - Atualiza usuário
+- `DELETE /api/v1/users/{id}` - Remove usuário
+
 ### Skills (Competências)
 - `GET /api/v1/skills` - Lista skills com paginação
 - `GET /api/v1/skills/{id}` - Obtém skill por ID
@@ -391,233 +540,123 @@ A API estará disponível em: `http://localhost:5118`
 ### Welcome
 - `GET /api/v1/wellcome` - Endpoint de teste (público)
 
+---
+
 ## 🔐 Autenticação
 
 A API utiliza autenticação via **API Key**. Configure a chave no `appsettings.json` e envie no header `X-API-Key` nas requisições.
 
-**Exemplo de requisição (Produção):**
-```bash
-curl -X GET "https://api-genfit-rm558515.azurewebsites.net/api/v1/jobs" \
-  -H "X-API-Key: your-secret-api-key" \
-  -H "Accept: application/json"
-```
-
-**Exemplo de requisição (Desenvolvimento):**
-```bash
-curl -X GET "http://localhost:5118/api/v1/jobs" \
-  -H "X-API-Key: your-secret-api-key" \
-  -H "Accept: application/json"
-```
-
 **Endpoints públicos (não requerem API Key):**
 - `/` - Rota raiz (redireciona para `/swagger`)
 - `/health` - Health Check
-- `/swagger` - Documentação Swagger (habilitado em todos os ambientes)
+- `/swagger` - Documentação Swagger
 - `/api/v1/wellcome` - Endpoint de boas-vindas
 
-## 🔍 Paginação e HATEOAS
+---
 
-Todos os endpoints de listagem suportam paginação:
+## 🚀 Provisionamento de Infraestrutura
 
-```
-GET /api/v1/jobs?pageNumber=1&pageSize=10
-```
+### Script de Infraestrutura
 
-A resposta inclui links HATEOAS:
-
-```json
-{
-  "items": [...],
-  "pageNumber": 1,
-  "pageSize": 10,
-  "totalCount": 100,
-  "totalPages": 10,
-  "hasPrevious": false,
-  "hasNext": true,
-  "links": {
-    "self": "/api/v1/jobs?pageNumber=1&pageSize=10",
-    "first": "/api/v1/jobs?pageNumber=1&pageSize=10",
-    "last": "/api/v1/jobs?pageNumber=10&pageSize=10",
-    "next": "/api/v1/jobs?pageNumber=2&pageSize=10"
-  }
-}
-```
-
-## 🏥 Health Check
-
-O endpoint `/health` verifica:
-- Conectividade com Oracle Database
-- Status geral da aplicação
-
-Resposta de exemplo:
-```json
-{
-  "status": "Healthy",
-  "checks": [
-    {
-      "name": "oracle-db",
-      "status": "Healthy",
-      "duration": "00:00:00.1234567"
-    }
-  ]
-}
-```
-
-## 🧪 Testes
-
-Execute os testes localmente:
-
-```bash
-dotnet test
-```
-
-**Testes automatizados na Pipeline:**
-- Testes executados automaticamente na Build Pipeline (CI)
-- Resultados publicados na aba "Tests" do Azure DevOps
-- Framework: xUnit
-- Cobertura: Testes unitários e de integração
-
-## 📖 Swagger/OpenAPI
-
-Acesse a documentação interativa em:
-- **Desenvolvimento:** `http://localhost:5118/swagger`
-- **Produção:** `https://api-genfit-rm558515.azurewebsites.net/swagger`
-- **Rota raiz:** `https://api-genfit-rm558515.azurewebsites.net/` (redireciona para Swagger)
-
-> **Nota:** O Swagger está habilitado em todos os ambientes para facilitar o acesso à documentação.
-
-## 🚀 Deploy no Azure
-
-O projeto inclui o script `scripts/script-infra-app.sh` para configuração automática da infraestrutura no Azure via Azure DevOps Pipeline.
-
-### 🏗️ Infraestrutura Azure
+O script `scripts/script-infra-app.sh` cria automaticamente todos os recursos necessários no Azure:
 
 **Recursos criados:**
-- **Resource Group:** `rg-genfit-YYYYMMDD` (criado dinamicamente com data)
-- **App Service Plan:** `asp-genfit` (SKU: B1, Linux)
-- **App Service:** `api-genfit-rm558515` (configurável via variável `NOME_WEBAPP`)
-- **Runtime:** .NET 8.0 (Linux)
+- Resource Group (`rg-genfit-YYYYMMDD`)
+- App Service Plan (`asp-genfit` - SKU B1, Linux)
+- App Service (`api-genfit-rm558515` - .NET 8.0)
+- App Settings configurados automaticamente
 
-**URLs de Produção:**
-- **API:** `https://api-genfit-rm558515.azurewebsites.net`
-- **Swagger:** `https://api-genfit-rm558515.azurewebsites.net/swagger`
-- **Health Check:** `https://api-genfit-rm558515.azurewebsites.net/health`
-- **Rota raiz:** `https://api-genfit-rm558515.azurewebsites.net/` (redireciona para Swagger)
-
-### 📜 Script de Infraestrutura
-
-O script `scripts/script-infra-app.sh` é **idempotente**, ou seja, pode ser executado múltiplas vezes sem criar recursos duplicados:
-
-**Funcionalidades:**
-- ✅ Verifica se Resource Group já existe antes de criar
-- ✅ Verifica se App Service Plan já existe antes de criar
-- ✅ Verifica se App Service já existe e obtém seu Resource Group correto
-- ✅ Configura App Settings automaticamente
+**Características:**
+- ✅ Idempotente (pode ser executado múltiplas vezes)
+- ✅ Verifica recursos existentes antes de criar
 - ✅ Suporta parâmetros nomeados e posicionais
 - ✅ Tratamento de erros robusto
 
-**Parâmetros aceitos:**
-- `-ORACLE_HOST` ou posicional: Host do Oracle
-- `-ORACLE_PORT` ou posicional: Porta do Oracle (padrão: 1521)
-- `-ORACLE_SID` ou posicional: SID do Oracle
-- `-ORACLE_USER` ou posicional: Usuário do Oracle
-- `-ORACLE_PASS` ou posicional: Senha do Oracle
-- `-LOCATION` ou posicional: Região do Azure (padrão: brazilsouth)
-
-**Variáveis de ambiente:**
-- `NOME_WEBAPP`: Nome do App Service (padrão: `api-genfit-rm558515`)
-
-### Variáveis de Ambiente
-
-Configure no Azure App Service (via Release Pipeline ou Portal):
-- `ASPNETCORE_ENVIRONMENT`: Production
-- `ConnectionStrings__OracleConnection`: String de conexão do Oracle
-- `ApiKey__HeaderName`: X-API-Key (opcional, padrão já configurado)
-- `ApiKey__Value`: Sua chave secreta (proteja via variáveis de ambiente)
-
-**Formato da Connection String:**
-```
-Data Source=oracle.fiap.com.br:1521/ORCL;User Id=rm558515;Password=Fiap#2025;
+**Uso na Pipeline:**
+O script é executado automaticamente na Build Pipeline (Job 1: Criar Infra Inicial) com os parâmetros:
+```bash
+-ORACLE_HOST oracle.fiap.com.br
+-ORACLE_PORT 1521
+-ORACLE_SID ORCL
+-ORACLE_USER rm558515
+-ORACLE_PASS Fiap#2025
+-LOCATION brazilsouth
 ```
 
-**⚠️ Problema comum:** Se receber erro `ORA-50007: Connection string is not well-formed`, a connection string não está configurada corretamente no Azure App Service.
-
-**Solução rápida:**
-1. Acesse o Portal do Azure → App Service `api-genfit-rm558515` → Configuration
-2. Adicione/Edite: `ConnectionStrings__OracleConnection` com o valor acima
-3. Salve e aguarde a reinicialização
-4. Ou execute: `.\corrigir-connection-string.ps1` (script na raiz do projeto)
+---
 
 ## 🔄 CI/CD Pipeline (Azure DevOps)
 
-O projeto utiliza **Azure DevOps** para CI/CD completo:
-
 ### 📋 Azure Boards
-- Work Items vinculados a commits, branches e Pull Requests
-- Rastreamento completo do ciclo de vida do desenvolvimento
+- ✅ Work Items criados e vinculados a commits, branches e Pull Requests
+- ✅ Rastreamento completo do ciclo de vida do desenvolvimento
+- ✅ Histórico completo de alterações
 
 ### 📦 Azure Repos
 - **Repositório:** `https://dev.azure.com/motosync/genfit/_git/genfit-CI`
-- **Branch principal:** `main` (protegida com políticas obrigatórias)
+- **Branch principal:** `main` (protegida)
 - **Políticas de branch:**
-  - Revisor obrigatório
-  - Vinculação de Work Item obrigatória
-  - Revisor padrão configurado
+  - ✅ Revisor obrigatório
+  - ✅ Vinculação de Work Item obrigatória
+  - ✅ Revisor padrão configurado
 
 ### 🔧 Azure Pipelines
 
 #### Pipeline de Build (CI)
-- **Arquivo:** `azure-pipeline.yml` (YAML na raiz do projeto)
-- **Nome:** `genfit-CI`
+- **Arquivo:** `azure-pipelines.yml` (YAML na raiz)
 - **Trigger:** Automaticamente após merge via Pull Request na branch `main`
 - **Etapas:**
-  1. **Provisionamento de infraestrutura** via Azure CLI (`scripts/script-infra-app.sh`)
-     - Cria Resource Group, App Service Plan e App Service (se não existirem)
-     - Configura App Settings automaticamente
-  2. **Restore de dependências** .NET (`dotnet restore`)
-  3. **Build da aplicação** (`dotnet build`)
-  4. **Execução de testes automatizados** (xUnit)
-     - Framework: xUnit
-     - Formato de saída: VSTest/TRX
-     - Cobertura: Controllers, Services
-  5. **Publicação de resultados de testes**
-     - Formato: VSTest
-     - Arquivos: `**/TestResults/**/*.trx`
-     - Exibição na aba "Tests" do Azure DevOps
-  6. **Publicação de artefatos** para deploy
-     - Pasta: `$(Build.ArtifactStagingDirectory)`
-     - Nome: `drop`
+  1. **Provisionamento de infraestrutura** via Azure CLI
+  2. **Restore** de dependências .NET
+  3. **Build** da aplicação
+  4. **Test** - Execução de testes automatizados (xUnit)
+  5. **Publish Test Results** - Publicação de resultados (formato VSTest/TRX)
+  6. **Publish** - Publicação de artefatos para deploy
 
 #### Pipeline de Release (CD)
 - **Tipo:** Classic Release Pipeline
 - **Nome:** `Deploy em dev`
 - **Trigger:** Automaticamente após Build gerar novo artefato
 - **Etapas:**
-  1. **Download de artefatos** da Build Pipeline
-  2. **Deploy automático** para Azure App Service
-     - Tipo: Azure App Service deploy
-     - App Service: `api-genfit-rm558515`
-  3. **Configuração de App Settings** (via variáveis de ambiente)
-     - `ASPNETCORE_ENVIRONMENT`: `$(ASPNETCORE_ENVIRONMENT)`
-     - `ConnectionStrings__OracleConnection`: `$(OracleConnection)`
+  1. Download de artefatos da Build Pipeline
+  2. Deploy automático para Azure App Service
+  3. Configuração de App Settings via variáveis de ambiente
 
-### 📄 Arquivos de Pipeline
+---
 
-- **Build Pipeline:** `azure-pipeline.yml` (raiz do projeto)
-- **Infraestrutura:** `scripts/script-infra-app.sh`
-- **Banco de dados:** `scripts/script-bd.sql`
+## 📄 Arquivos de Entrega
+
+- ✅ `azure-pipelines.yml` - Pipeline YAML na raiz do repositório
+- ✅ `scripts/script-infra-app.sh` - Script Azure CLI para provisionamento
+- ✅ `scripts/script-bd.sql` - Script SQL com schema completo do banco
+- ✅ `README.md` - Documentação completa com exemplos JSON de CRUD
+
+---
+
+## 🧪 Testes Automatizados
+
+- **Framework:** xUnit
+- **Cobertura:** Controllers, Services
+- **Publicação:** Resultados publicados na Build Pipeline (formato VSTest/TRX)
+- **Visualização:** Resultados visíveis na aba "Tests" do Azure DevOps
+
+---
+
+## 📖 Swagger/OpenAPI
+
+Acesse a documentação interativa:
+- **Produção:** `https://api-genfit-rm558515.azurewebsites.net/swagger`
+- **Rota raiz:** `https://api-genfit-rm558515.azurewebsites.net/` (redireciona para Swagger)
+
+---
 
 ## 📝 Versionamento da API
 
-A API utiliza versionamento via URL:
 - **Versão atual:** `v1`
 - **Formato:** `/api/v1/{resource}`
+- **Controle via:** URL, query string, header ou media type
 
-O versionamento pode ser especificado via:
-- URL: `/api/v1/jobs`
-- Query string: `?api-version=1.0`
-- Header: `X-Version: 1.0`
-- Media type: `application/json;ver=1.0`
+---
 
 ## 🎯 Status Codes HTTP
 
@@ -629,116 +668,16 @@ O versionamento pode ser especificado via:
 - `404 Not Found` - Recurso não encontrado
 - `500 Internal Server Error` - Erro interno do servidor
 
-## 📄 Licença
+---
 
-Este projeto foi desenvolvido para fins acadêmicos como parte do curso FIAP.
+## 📞 Informações de Contato
 
-## 👥 Contribuição
-
-Desenvolvido para o projeto **"O Futuro do Trabalho"** - GenFit
-
-## 📞 Suporte
-
-Para questões sobre a API, consulte a documentação Swagger ou abra uma issue no repositório.
+**Desenvolvido para:** Global Solution (GS) - DevOps Tools & Cloud Computing  
+**Tema:** "O Futuro do Trabalho"  
+**Disciplina:** Advanced Business Development with .NET  
+**Instituição:** FIAP
 
 ---
 
-**🔗 Repositório:** [https://github.com/bispado/genfitdotnet](https://github.com/bispado/genfitdotnet)
-
-**📅 Última atualização:** 2025-11-23 - API em produção com CI/CD completo, pipeline corrigida e repositório atualizado
-
-**🔗 Azure DevOps:** [https://dev.azure.com/motosync/genfit](https://dev.azure.com/motosync/genfit)
-
-**📦 Repositório Azure DevOps:** [https://dev.azure.com/motosync/genfit/_git/genfit-CI](https://dev.azure.com/motosync/genfit/_git/genfit-CI)
-
-**🌐 API em Produção:** [https://api-genfit-rm558515.azurewebsites.net](https://api-genfit-rm558515.azurewebsites.net)
-
+**📅 Última atualização:** 2025-11-23  
 **✅ Status:** API funcional em produção | CI/CD configurado | Testes automatizados | Swagger habilitado
-
----
-
-## 🎯 DevOps Tools & Cloud Computing (GS)
-
-Este projeto foi desenvolvido como solução para a **Global Solution (GS)** de **DevOps Tools & Cloud Computing**, demonstrando a integração completa das ferramentas Azure DevOps:
-
-### ✅ Requisitos Atendidos
-
-1. **Provisionamento em Nuvem (Azure CLI)**
-   - Script `scripts/script-infra-app.sh` cria automaticamente Resource Group, App Service Plan e App Service
-   - Script idempotente: verifica recursos existentes antes de criar novos
-   - Suporte a variáveis de ambiente e parâmetros nomeados
-
-2. **Azure Boards**
-   - Work Items criados e vinculados a commits, branches e Pull Requests
-   - Rastreamento completo do ciclo de vida do desenvolvimento
-   - Histórico completo de alterações
-
-3. **Azure Repos**
-   - Repositório Git com versionamento completo
-   - Branch principal (`main`) protegida com políticas obrigatórias:
-     - Revisor obrigatório
-     - Vinculação de Work Item obrigatória
-     - Revisor padrão configurado
-   - Integração com GitHub: `https://github.com/bispado/genfitdotnet`
-
-4. **Azure Pipelines**
-   - **Build Pipeline (YAML):** CI completo com testes automatizados e publicação de artefatos
-     - Execução automática após merge via Pull Request
-     - Publicação de resultados de testes (xUnit)
-     - Geração de artefatos para deploy
-   - **Release Pipeline (Classic):** CD automático após cada build bem-sucedido
-     - Deploy automático para Azure App Service
-     - Configuração de App Settings via variáveis de ambiente
-
-5. **Infraestrutura em Nuvem**
-   - API deployada em Azure App Service (PaaS) - Linux, .NET 8.0
-   - Oracle Database (externo - FIAP Cloud)
-   - Recursos provisionados via Azure CLI (idempotente)
-   - App Settings protegidos via variáveis de ambiente
-
-6. **Testes Automatizados**
-   - Testes unitários com xUnit
-   - Testes de integração para controllers
-   - Publicação de resultados na Build Pipeline (formato VSTest/TRX)
-   - Cobertura de endpoints principais (CRUD)
-
-7. **Documentação**
-   - README completo com exemplos JSON de CRUD para todas as tabelas
-   - Swagger habilitado em produção para documentação interativa
-   - Scripts de infraestrutura documentados
-   - Arquivo `scripts/script-bd.sql` com schema completo do banco de dados
-
-### 📊 Arquitetura
-
-A solução utiliza uma arquitetura em camadas (Clean Architecture):
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                    Azure App Service                    │
-│                  (PaaS - Linux, .NET 8)                 │
-├─────────────────────────────────────────────────────────┤
-│  GenFit.API (Controllers, Middleware, Program.cs)       │
-│  ↓                                                       │
-│  GenFit.Application (Services, DTOs, Common)            │
-│  ↓                                                       │
-│  GenFit.Infrastructure (DbContext, EF Core, Services)   │
-│  ↓                                                       │
-│  GenFit.Core (Entities, Interfaces)                     │
-└─────────────────────────────────────────────────────────┘
-                        ↓
-┌─────────────────────────────────────────────────────────┐
-│              Oracle Database (FIAP Cloud)               │
-│  (USERS, JOBS, SKILLS, COURSES, MODEL_RESULTS, etc.)    │
-└─────────────────────────────────────────────────────────┘
-```
-
-**Fluxo CI/CD:**
-```
-Developer → Commit → Pull Request → Merge → Build Pipeline
-                                                      ↓
-                                              Testes + Artefatos
-                                                      ↓
-                                              Release Pipeline
-                                                      ↓
-                                              Azure App Service
-```
