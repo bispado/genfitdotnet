@@ -537,8 +537,16 @@ Configure no Azure App Service (via Release Pipeline ou Portal):
 
 **Formato da Connection String:**
 ```
-Data Source=oracle.fiap.com.br:1521/ORCL;User Id=USER;Password=PASSWORD;
+Data Source=oracle.fiap.com.br:1521/ORCL;User Id=rm558515;Password=Fiap#2025;
 ```
+
+**⚠️ Problema comum:** Se receber erro `ORA-50007: Connection string is not well-formed`, a connection string não está configurada corretamente no Azure App Service.
+
+**Solução rápida:**
+1. Acesse o Portal do Azure → App Service `api-genfit-rm558515` → Configuration
+2. Adicione/Edite: `ConnectionStrings__OracleConnection` com o valor acima
+3. Salve e aguarde a reinicialização
+4. Ou execute: `.\corrigir-connection-string.ps1` (script na raiz do projeto)
 
 ## 🔄 CI/CD Pipeline (Azure DevOps)
 
