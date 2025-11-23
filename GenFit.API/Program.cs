@@ -85,14 +85,13 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline
-if (app.Environment.IsDevelopment())
+// Swagger habilitado em todos os ambientes para demonstração
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "GenFit API v1");
-    });
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "GenFit API v1");
+    c.RoutePrefix = "swagger"; // Define a rota /swagger como padrão
+});
 
 app.UseSerilogRequestLogging();
 
@@ -124,6 +123,10 @@ app.MapGet("/api/v1/wellcome", () => Results.Text("Bem-vindo à API GenFit - O F
     .WithName("Wellcome")
     .WithTags("Health")
     .Produces<string>(StatusCodes.Status200OK);
+
+// Rota raiz que redireciona para o Swagger
+app.MapGet("/", () => Results.Redirect("/swagger"))
+    .ExcludeFromDescription();
 
 app.UseRouting();
 

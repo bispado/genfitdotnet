@@ -395,7 +395,14 @@ A API estará disponível em: `http://localhost:5118`
 
 A API utiliza autenticação via **API Key**. Configure a chave no `appsettings.json` e envie no header `X-API-Key` nas requisições.
 
-**Exemplo de requisição:**
+**Exemplo de requisição (Produção):**
+```bash
+curl -X GET "https://api-genfit-rm558515.azurewebsites.net/api/v1/jobs" \
+  -H "X-API-Key: your-secret-api-key" \
+  -H "Accept: application/json"
+```
+
+**Exemplo de requisição (Desenvolvimento):**
 ```bash
 curl -X GET "http://localhost:5118/api/v1/jobs" \
   -H "X-API-Key: your-secret-api-key" \
@@ -403,8 +410,9 @@ curl -X GET "http://localhost:5118/api/v1/jobs" \
 ```
 
 **Endpoints públicos (não requerem API Key):**
+- `/` - Rota raiz (redireciona para `/swagger`)
 - `/health` - Health Check
-- `/swagger` - Documentação Swagger
+- `/swagger` - Documentação Swagger (habilitado em todos os ambientes)
 - `/api/v1/wellcome` - Endpoint de boas-vindas
 
 ## 🔍 Paginação e HATEOAS
@@ -457,21 +465,43 @@ Resposta de exemplo:
 
 ## 🧪 Testes
 
-Execute os testes com:
+Execute os testes localmente:
 
 ```bash
 dotnet test
 ```
 
+**Testes automatizados na Pipeline:**
+- Testes executados automaticamente na Build Pipeline (CI)
+- Resultados publicados na aba "Tests" do Azure DevOps
+- Framework: xUnit
+- Cobertura: Testes unitários e de integração
+
 ## 📖 Swagger/OpenAPI
 
 Acesse a documentação interativa em:
 - **Desenvolvimento:** `http://localhost:5118/swagger`
-- **Produção:** `https://{your-app-service}.azurewebsites.net/swagger`
+- **Produção:** `https://api-genfit-rm558515.azurewebsites.net/swagger`
+- **Rota raiz:** `https://api-genfit-rm558515.azurewebsites.net/` (redireciona para Swagger)
+
+> **Nota:** O Swagger está habilitado em todos os ambientes para facilitar o acesso à documentação.
 
 ## 🚀 Deploy no Azure
 
-O projeto inclui o script `infra-app.sh` para configuração automática da infraestrutura no Azure via Azure DevOps Pipeline.
+O projeto inclui o script `scripts/script-infra-app.sh` para configuração automática da infraestrutura no Azure via Azure DevOps Pipeline.
+
+### 🏗️ Infraestrutura Azure
+
+**Recursos criados:**
+- **Resource Group:** `rg-genfit-YYYYMMDD`
+- **App Service Plan:** `asp-genfit` (SKU: B1)
+- **App Service:** `api-genfit-rm558515`
+- **Runtime:** .NET 8.0 (Linux)
+
+**URLs de Produção:**
+- **API:** `https://api-genfit-rm558515.azurewebsites.net`
+- **Swagger:** `https://api-genfit-rm558515.azurewebsites.net/swagger`
+- **Health Check:** `https://api-genfit-rm558515.azurewebsites.net/health`
 
 ### Variáveis de Ambiente
 
@@ -480,6 +510,49 @@ Configure no Azure App Service:
 - `ConnectionStrings__OracleConnection`: String de conexão do Oracle
 - `ApiKey__HeaderName`: X-API-Key
 - `ApiKey__Value`: Sua chave secreta
+
+## 🔄 CI/CD Pipeline (Azure DevOps)
+
+O projeto utiliza **Azure DevOps** para CI/CD completo:
+
+### 📋 Azure Boards
+- Work Items vinculados a commits, branches e Pull Requests
+- Rastreamento completo do ciclo de vida do desenvolvimento
+
+### 📦 Azure Repos
+- **Repositório:** `https://dev.azure.com/motosync/genfit/_git/genfit`
+- **Branch principal:** `main` (protegida com políticas obrigatórias)
+- **Políticas de branch:**
+  - Revisor obrigatório
+  - Vinculação de Work Item obrigatória
+  - Revisor padrão configurado
+
+### 🔧 Azure Pipelines
+
+#### Pipeline de Build (CI)
+- **Nome:** `genfit-CI`
+- **Trigger:** Automaticamente após merge via Pull Request
+- **Etapas:**
+  1. Provisionamento de infraestrutura via Azure CLI (`scripts/script-infra-app.sh`)
+  2. Restore de dependências .NET
+  3. Build da aplicação
+  4. Execução de testes automatizados (xUnit)
+  5. Publicação de resultados de testes
+  6. Publicação de artefatos para deploy
+
+#### Pipeline de Release (CD)
+- **Nome:** `Deploy em dev`
+- **Trigger:** Automaticamente após Build gerar novo artefato
+- **Etapas:**
+  1. Download de artefatos da Build Pipeline
+  2. Deploy automático para Azure App Service
+  3. Configuração de App Settings
+
+### 📄 Arquivos de Pipeline
+
+- **Build Pipeline:** `azure-pipeline.yml` (raiz do projeto)
+- **Infraestrutura:** `scripts/script-infra-app.sh`
+- **Banco de dados:** `scripts/script-bd.sql`
 
 ## 📝 Versionamento da API
 
@@ -519,6 +592,46 @@ Para questões sobre a API, consulte a documentação Swagger ou abra uma issue 
 
 **🔗 Repositório:** [https://github.com/bispado/genfitdotnet](https://github.com/bispado/genfitdotnet)
 
-**📅 Última atualização:** 2025-11-22 - Teste de pipeline CI/CD
+**📅 Última atualização:** 2025-11-23 - API em produção com CI/CD completo configurado
 
 **🔗 Azure DevOps:** [https://dev.azure.com/motosync/genfit](https://dev.azure.com/motosync/genfit)
+
+**🌐 API em Produção:** [https://api-genfit-rm558515.azurewebsites.net](https://api-genfit-rm558515.azurewebsites.net)
+
+---
+
+## 🎯 DevOps Tools & Cloud Computing (GS)
+
+Este projeto foi desenvolvido como solução para a **Global Solution (GS)** de **DevOps Tools & Cloud Computing**, demonstrando a integração completa das ferramentas Azure DevOps:
+
+### ✅ Requisitos Atendidos
+
+1. **Provisionamento em Nuvem (Azure CLI)**
+   - Script `scripts/script-infra-app.sh` cria automaticamente Resource Group, App Service Plan e App Service
+
+2. **Azure Boards**
+   - Work Items criados e vinculados a commits, branches e Pull Requests
+   - Rastreamento completo do desenvolvimento
+
+3. **Azure Repos**
+   - Repositório Git com versionamento completo
+   - Branch principal protegida com políticas obrigatórias
+
+4. **Azure Pipelines**
+   - **Build Pipeline:** CI completo com testes automatizados e publicação de artefatos
+   - **Release Pipeline:** CD automático após cada build bem-sucedido
+
+5. **Infraestrutura em Nuvem**
+   - API deployada em Azure App Service (PaaS)
+   - Oracle Database (externo - FIAP Cloud)
+   - Recursos provisionados via Azure CLI
+
+6. **Testes Automatizados**
+   - Testes unitários com xUnit
+   - Publicação de resultados na Build Pipeline
+   - Cobertura de endpoints principais
+
+7. **Documentação**
+   - README completo com exemplos JSON de CRUD
+   - Swagger habilitado em produção
+   - Diagrama de arquitetura macro
