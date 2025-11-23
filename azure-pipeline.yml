@@ -7,6 +7,8 @@
 # Agent Queue 'Azure Pipelines' was used with unrecognized Agent Specification, vmImage property must be specified to determine image - https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/hosted?view=azure-devops&tabs=yaml#software
 # Agent Queue 'Azure Pipelines' was used with unrecognized Agent Specification, vmImage property must be specified to determine image - https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/hosted?view=azure-devops&tabs=yaml#software
 variables:
+- name: BuildConfiguration
+  value: 'Release'
 - name: BuildParameters.RestoreBuildProjects
   value: '**/*.csproj'
 - name: BuildParameters.TestProjects
@@ -20,7 +22,7 @@ jobs:
 - job: Job_2
   displayName: Criar Infra Inicial
   pool:
-    name: Azure Pipelines
+    vmImage: 'ubuntu-latest'
   steps:
   - checkout: self
     fetchDepth: 1
@@ -35,10 +37,15 @@ jobs:
   displayName: Build and Test
   dependsOn: Job_2
   pool:
-    name: Azure Pipelines
+    vmImage: 'ubuntu-latest'
   steps:
   - checkout: self
     fetchDepth: 1
+  - task: UseDotNet@2
+    displayName: 'Use .NET 8 SDK'
+    inputs:
+      packageType: 'sdk'
+      version: '8.0.x'
   - task: DotNetCoreCLI@2
     displayName: Restore
     inputs:
@@ -47,29 +54,32 @@ jobs:
   - task: DotNetCoreCLI@2
     displayName: Build
     inputs:
+      command: build
       projects: $(BuildParameters.RestoreBuildProjects)
-      arguments: --configuration $(BuildConfiguration)
+      arguments: '--configuration $(BuildConfiguration) --no-restore'
   - task: DotNetCoreCLI@2
     displayName: Test
     inputs:
       command: test
       projects: $(BuildParameters.TestProjects)
-      arguments: --configuration $(BuildConfiguration) --logger "trx;LogFileName=test-results.trx" --results-directory "$(Agent.TempDirectory)/TestResults"
-      testRunTitle: Testes de CURD
+      arguments: '--configuration $(BuildConfiguration) --no-build --logger "trx;LogFileName=test-results.trx" --results-directory "$(Agent.TempDirectory)/TestResults"'
+      testRunTitle: 'Testes de CRUD'
   - task: PublishTestResults@2
     displayName: Publish Test Results
+    condition: succeededOrFailed()
     inputs:
       testRunner: VSTest
-      testResultsFiles: '**/TestResults/**/*.trx'
+      testResultsFiles: '$(Agent.TempDirectory)/TestResults/**/*.trx'
       mergeTestResults: true
+      testRunTitle: 'Testes de CRUD'
   - task: DotNetCoreCLI@2
     displayName: Publish
     inputs:
       command: publish
-      publishWebProjects: True
-      projects: $(BuildParameters.RestoreBuildProjects)
-      arguments: --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)
-      zipAfterPublish: True
+      publishWebProjects: false
+      projects: 'GenFit.API/GenFit.API.csproj'
+      arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory) --no-build --no-restore'
+      zipAfterPublish: true
   - task: PublishBuildArtifacts@1
     displayName: Publish Artifact
     inputs:
