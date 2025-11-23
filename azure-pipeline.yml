@@ -70,11 +70,11 @@ jobs:
     inputs:
       command: test
       projects: $(BuildParameters.TestProjects)
-      arguments: '--configuration $(BuildConfiguration) --no-restore --logger "trx;LogFileName=test-results.trx" --results-directory "$(Agent.TempDirectory)/TestResults" --verbosity normal --diag "$(Agent.TempDirectory)/test-diag.log"'
+      arguments: '--configuration $(BuildConfiguration) --no-restore --logger "trx;LogFileName=test-results.trx" --verbosity normal'
       testRunTitle: 'Testes de CRUD'
   - script: |
       echo "Listando arquivos de teste gerados:"
-      find $(Agent.TempDirectory)/TestResults -name "*.trx" -type f || echo "Nenhum arquivo .trx encontrado"
+      find $(Agent.TempDirectory) -name "*.trx" -type f || echo "Nenhum arquivo .trx encontrado"
     displayName: 'Verificar arquivos de teste gerados'
     condition: always()
   - task: PublishTestResults@2
@@ -82,7 +82,7 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       testRunner: VSTest
-      testResultsFiles: '$(Agent.TempDirectory)/TestResults/**/*.trx'
+      testResultsFiles: '$(Agent.TempDirectory)/**/*.trx'
       mergeTestResults: true
       testRunTitle: 'Testes de CRUD'
   - task: DotNetCoreCLI@2
