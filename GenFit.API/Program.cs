@@ -38,6 +38,10 @@ builder.Services.AddOpenTelemetry()
 builder.Services.AddDbContext<GenFitDbContext>(options =>
     options.UseOracle(builder.Configuration.GetConnectionString("OracleConnection")));
 
+// Add Entity Framework Core with Azure SQL
+builder.Services.AddDbContext<AzureSqlDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AzureSqlConnection")));
+
 // Health Checks
 builder.Services.AddHealthChecks()
     .AddCheck<OracleHealthCheck>("oracle-db")
@@ -66,6 +70,7 @@ builder.Services.AddApiVersioning(options =>
 builder.Services.AddScoped<GenFit.Infrastructure.Services.OracleProcedureService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJobService, JobService>();
+builder.Services.AddScoped<IAzJobService, AzJobService>();
 
 // Add controllers
 builder.Services.AddControllers();

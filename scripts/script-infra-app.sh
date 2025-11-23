@@ -77,6 +77,12 @@ APP_SERVICE_PLAN="asp-genfit"
 APP_SERVICE_NAME="${NOME_WEBAPP:-api-genfit-$(whoami | tr '[:upper:]' '[:lower:]')}"
 SKU="B1"
 
+# Configurações do Azure SQL
+SQL_SERVER_NAME="sql-genfit-$(echo $APP_SERVICE_NAME | tr -d '-' | cut -c1-20)"
+SQL_DB_NAME="GenFitDB"
+SQL_ADMIN_USER="sqladmin"
+SQL_ADMIN_PASSWORD="GenFit@2025#Secure"
+
 echo "=========================================="
 echo "Criando infraestrutura no Azure"
 echo "=========================================="
@@ -87,6 +93,8 @@ echo "Oracle User: $ORACLE_USER"
 echo "Location: $LOCATION"
 echo "Resource Group: $RESOURCE_GROUP"
 echo "App Service: $APP_SERVICE_NAME"
+echo "SQL Server: $SQL_SERVER_NAME"
+echo "SQL Database: $SQL_DB_NAME"
 echo "=========================================="
 
 # Verificar se está logado no Azure
@@ -132,6 +140,61 @@ else
     echo "App Service Plan '$APP_SERVICE_PLAN' já existe. Usando o existente."
 fi
 
+# ============================================================
+# Criar Azure SQL Server e Database
+# ============================================================
+echo "Verificando Azure SQL Server: $SQL_SERVER_NAME..."
+SQL_SERVER_EXISTS=$(az sql server list --resource-group "$RESOURCE_GROUP" --query "[?name=='$SQL_SERVER_NAME']" -o tsv 2>/dev/null)
+
+if [ -z "$SQL_SERVER_EXISTS" ]; then
+    echo "Criando Azure SQL Server: $SQL_SERVER_NAME..."
+    az sql server create \
+        --name "$SQL_SERVER_NAME" \
+        --resource-group "$RESOURCE_GROUP" \
+        --location "$LOCATION" \
+        --admin-user "$SQL_ADMIN_USER" \
+        --admin-password "$SQL_ADMIN_PASSWORD" || {
+        echo "ERRO: Falha ao criar SQL Server"
+        exit 1
+    }
+    
+    # Configurar firewall para permitir serviços Azure
+    echo "Configurando firewall do SQL Server..."
+    az sql server firewall-rule create \
+        --resource-group "$RESOURCE_GROUP" \
+        --server "$SQL_SERVER_NAME" \
+        --name "AllowAzureServices" \
+        --start-ip-address "0.0.0.0" \
+        --end-ip-address "0.0.0.0" || {
+        echo "AVISO: Falha ao configurar firewall (pode já existir)"
+    }
+else
+    echo "SQL Server '$SQL_SERVER_NAME' já existe. Usando o existente."
+fi
+
+# Verificar se SQL Database já existe
+echo "Verificando Azure SQL Database: $SQL_DB_NAME..."
+SQL_DB_EXISTS=$(az sql db list --resource-group "$RESOURCE_GROUP" --server "$SQL_SERVER_NAME" --query "[?name=='$SQL_DB_NAME']" -o tsv 2>/dev/null)
+
+if [ -z "$SQL_DB_EXISTS" ]; then
+    echo "Criando Azure SQL Database: $SQL_DB_NAME..."
+    az sql db create \
+        --resource-group "$RESOURCE_GROUP" \
+        --server "$SQL_SERVER_NAME" \
+        --name "$SQL_DB_NAME" \
+        --service-objective "Basic" \
+        --backup-storage-redundancy "Local" || {
+        echo "ERRO: Falha ao criar SQL Database"
+        exit 1
+    }
+    echo "✅ Azure SQL Database criado com sucesso!"
+else
+    echo "SQL Database '$SQL_DB_NAME' já existe. Usando o existente."
+fi
+
+# Construir connection string do Azure SQL
+AZURE_SQL_CONNECTION_STRING="Server=tcp:$SQL_SERVER_NAME.database.windows.net,1433;Initial Catalog=$SQL_DB_NAME;Persist Security Info=False;User ID=$SQL_ADMIN_USER;Password=$SQL_ADMIN_PASSWORD;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+
 # Verificar se App Service já existe
 WEBAPP_EXISTS=$(az webapp list --resource-group "$RESOURCE_GROUP" --query "[?name=='$APP_SERVICE_NAME']" -o tsv)
 
@@ -162,6 +225,7 @@ az webapp config appsettings set \
     --settings \
         ASPNETCORE_ENVIRONMENT="Production" \
         ConnectionStrings__OracleConnection="$ORACLE_CONNECTION_STRING" \
+        ConnectionStrings__AzureSqlConnection="$AZURE_SQL_CONNECTION_STRING" \
         ApiKey__HeaderName="X-API-Key" \
         ApiKey__Value="change-in-production" || {
     echo "ERRO: Falha ao configurar App Settings"
@@ -182,4 +246,11 @@ echo "Infraestrutura criada com sucesso!"
 echo "=========================================="
 echo "Resource Group: $RESOURCE_GROUP"
 echo "App Service: https://$APP_SERVICE_NAME.azurewebsites.net"
+echo "SQL Server: $SQL_SERVER_NAME.database.windows.net"
+echo "SQL Database: $SQL_DB_NAME"
+echo "=========================================="
+echo ""
+echo "IMPORTANTE: Execute o script SQL para criar as tabelas:"
+echo "  scripts/script-bd-azure.sql"
+echo "  Conecte-se ao SQL Server e execute o script"
 echo "=========================================="
