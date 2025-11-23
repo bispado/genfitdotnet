@@ -637,9 +637,11 @@ Para questões sobre a API, consulte a documentação Swagger ou abra uma issue 
 
 **🔗 Repositório:** [https://github.com/bispado/genfitdotnet](https://github.com/bispado/genfitdotnet)
 
-**📅 Última atualização:** 2025-11-23 - API em produção com CI/CD completo e script de infraestrutura idempotente
+**📅 Última atualização:** 2025-11-23 - API em produção com CI/CD completo, pipeline corrigida e repositório atualizado
 
 **🔗 Azure DevOps:** [https://dev.azure.com/motosync/genfit](https://dev.azure.com/motosync/genfit)
+
+**📦 Repositório Azure DevOps:** [https://dev.azure.com/motosync/genfit/_git/genfit-CI](https://dev.azure.com/motosync/genfit/_git/genfit-CI)
 
 **🌐 API em Produção:** [https://api-genfit-rm558515.azurewebsites.net](https://api-genfit-rm558515.azurewebsites.net)
 
