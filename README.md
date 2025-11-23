@@ -6,7 +6,7 @@
 [![Oracle](https://img.shields.io/badge/Oracle-Database-F80000?style=flat&logo=oracle)](https://www.oracle.com/database/)
 [![Entity Framework](https://img.shields.io/badge/EF%20Core-8.0-512BD4?style=flat&logo=.net)](https://learn.microsoft.com/ef/core/)
 
-## 🚀 Tecnologias
+## 🚀 Tecnologia
 
 - **.NET 8.0** - Framework principal
 - **Entity Framework Core** - ORM com provider Oracle
