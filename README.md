@@ -549,7 +549,7 @@ O projeto utiliza **Azure DevOps** para CI/CD completo:
 - Rastreamento completo do ciclo de vida do desenvolvimento
 
 ### 📦 Azure Repos
-- **Repositório:** `https://dev.azure.com/motosync/genfit/_git/genfit`
+- **Repositório:** `https://dev.azure.com/motosync/genfit/_git/genfit-CI`
 - **Branch principal:** `main` (protegida com políticas obrigatórias)
 - **Políticas de branch:**
   - Revisor obrigatório
