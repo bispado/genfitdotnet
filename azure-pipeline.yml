@@ -14,9 +14,7 @@ variables:
 - name: BuildParameters.TestProjects
   value: '**/*[Tt]ests/*.csproj'
 trigger:
-  branches:
-    include:
-    - refs/heads/main
+  - main
 name: $(date:yyyyMMdd)$(rev:.r)
 jobs:
 - job: Job_2
