@@ -2,8 +2,8 @@
 
 # Script de infraestrutura para deploy da API GenFit no Azure
 # Parâmetros esperados: ORACLE_HOST ORACLE_PORT ORACLE_SID ORACLE_USER ORACLE_PASS LOCATION
-# Uso: ./infra-app.sh <ORACLE_HOST> <ORACLE_PORT> <ORACLE_SID> <ORACLE_USER> <ORACLE_PASS> <LOCATION>
-# Ou: ./infra-app.sh -ORACLE_HOST host -ORACLE_PORT port -ORACLE_SID sid -ORACLE_USER user -ORACLE_PASS pass -LOCATION location
+# Uso: ./scripts/script-infra-app.sh <ORACLE_HOST> <ORACLE_PORT> <ORACLE_SID> <ORACLE_USER> <ORACLE_PASS> <LOCATION>
+# Ou: ./scripts/script-infra-app.sh -ORACLE_HOST host -ORACLE_PORT port -ORACLE_SID sid -ORACLE_USER user -ORACLE_PASS pass -LOCATION location
 
 set -e
 
