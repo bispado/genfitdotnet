@@ -46,11 +46,19 @@ jobs:
     inputs:
       packageType: 'sdk'
       version: '8.0.x'
+      installationPath: $(Agent.ToolsDirectory)/dotnet
+  - script: |
+      echo "Verificando versão do .NET:"
+      dotnet --version
+      echo "Verificando SDKs instalados:"
+      dotnet --list-sdks
+    displayName: 'Verificar versão do .NET'
   - task: DotNetCoreCLI@2
     displayName: Restore
     inputs:
       command: restore
       projects: $(BuildParameters.RestoreBuildProjects)
+      feedsToUse: 'select'
   - task: DotNetCoreCLI@2
     displayName: Build
     inputs:
@@ -62,8 +70,13 @@ jobs:
     inputs:
       command: test
       projects: $(BuildParameters.TestProjects)
-      arguments: '--configuration $(BuildConfiguration) --no-build --logger "trx;LogFileName=test-results.trx" --results-directory "$(Agent.TempDirectory)/TestResults"'
+      arguments: '--configuration $(BuildConfiguration) --no-restore --logger "trx;LogFileName=test-results.trx" --results-directory "$(Agent.TempDirectory)/TestResults" --verbosity normal --diag "$(Agent.TempDirectory)/test-diag.log"'
       testRunTitle: 'Testes de CRUD'
+  - script: |
+      echo "Listando arquivos de teste gerados:"
+      find $(Agent.TempDirectory)/TestResults -name "*.trx" -type f || echo "Nenhum arquivo .trx encontrado"
+    displayName: 'Verificar arquivos de teste gerados'
+    condition: always()
   - task: PublishTestResults@2
     displayName: Publish Test Results
     condition: succeededOrFailed()
